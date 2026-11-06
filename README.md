@@ -1,78 +1,41 @@
+# Martin Alcock: personal site
 
-# Storyblok Core Space Blueprint: Nuxt
+Nuxt site rendering content from the **storyblok-site** Storyblok space (EU region). Built on Storyblok's Nuxt blueprint.
 
-Integrate [Nuxt](https://nuxt.com/) with [Storyblok](http://www.storyblok.com) as a headless CMS.
-
-This blueprint is ideal for kickstarting new Storyblok and Next.js projects. What's inside:
-- Pre-configured default blocks: `page`, `teaser`, `grid`, and `feature`.
-- Support for the Visual Editor's live preview.
-- Dynamic routing to fetch and render new stories automatically.
-- Minimal styling.
-
-> [!TIP]
-> Follow our [Nuxt guide](LINK) for a step-by-step walkthrough and learn more about Storyblok's range of features, including rich text rendering, custom content modeling, and internationalization. See the [@storyblok/nuxt package reference](https://storyblok.com/docs/packages/storyblok-nuxt) for further information.
-
-***
-
-[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in%20GitHub%20Codespaces-dad4ff.svg?style=for-the-badge&logo=GitHub&logoColor=181717&labelColor=ffffff&color=dad4ff)](https://github.com/codespaces/new?skip_quickstart=true&machine=basicLinux32gb&repo=962644002&ref=main&geo=EuropeWest)
-[![Try Storyblok free](https://img.shields.io/badge/Try%20Storyblok-dad4ff.svg?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTQuNzA3IDIuNTM4aDIyLjUyOXYyMy41ODdINC43MDd6IiBzdHlsZT0iZmlsbDojZmZmIi8+PHBhdGggZmlsbD0iIzFmMWYxZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMS43NDMgMi42MDFBMi41OTcgMi41OTcgMCAwIDEgNC4zMzUgMGgyMy4zM2EyLjU5NyAyLjU5NyAwIDAgMSAyLjU5MiAyLjYwMXYyMy40MTFhMi41OTcgMi41OTcgMCAwIDEtMi41OTIgMi42MDJIMTIuNTQ4bC0zLjg3MiAzLjIwOGEuNzcuNzcgMCAwIDEtMS4yNjEtLjU5N3YtMi42MTFoLTMuMDhhMi41OTcgMi41OTcgMCAwIDEtMi41OTItMi42MDJabTUuNjcgMi4xMjdoMTIuNDYyYzIuNjkxIDAgNC44NzMgMi4xOSA0Ljg3MyA0Ljg5IDAgMi4xNjQtMS40IDQtMy4zNDIgNC42NDRhNC44ODcgNC44ODcgMCAwIDEgMy45OSA0LjgxYzAgMi43MDEtMi4xODEgNC44OS00Ljg3MyA0Ljg5SDcuNDEzdi05LjQ1NFptMTAuMzY0IDQuNEgxMS45NXYyLjkzNGg1LjgyOGMuODA4IDAgMS40NjItLjY1NiAxLjQ2Mi0xLjQ2NyAwLS44MS0uNjU0LTEuNDY3LTEuNDYyLTEuNDY3em0tNS44MjggNi41Mmg2LjMxNGMuODk3IDAgMS42MjQuNzMgMS42MjQgMS42MyAwIC45MDEtLjcyNyAxLjYzLTEuNjI0IDEuNjNoLTYuMzE0eiIgY2xpcC1ydWxlPSJldmVub2RkIiBzdHlsZT0ic3Ryb2tlLXdpZHRoOjEuNTE3NzUiLz48L3N2Zz4K&labelColor=ffffff)](https://app.storyblok.com/#/signup)
-[![Join the Storyblok Discord community](https://img.shields.io/discord/700316478792138842?style=for-the-badge&logo=discord&label=Join%20our%20community&labelColor=ffffff&color=dad4ff)](https://storyblok.com/join-discord)
-
-## Get Started
-
-**No Storyblok account yet? [Sign up now](https://app.storyblok.com/#/signup?utm_source=docs) to experience a 14-day free trial of all features and enjoy our completely free Starter plan.**
-
-1. Create an empty new Storyblok space
-2. Create a new repository based on this template
-3. Open the project on your device
-4. Install dependencies
+## Local development and the Visual Editor
 
 ```sh
 npm install
+npm run dev   # https://localhost:3000, reads draft content
 ```
 
-### Authentication
-
-In the root of the project, create a `.env` file to store the access token of your space:
+`.env` (gitignored):
 
 ```sh
-STORYBLOK_DELIVERY_API_TOKEN=<REPLACE_WITH_YOUR_TOKEN>
+STORYBLOK_DELIVERY_API_TOKEN=<the space's Preview token>
+STORYBLOK_REGION=eu
 ```
 
-> [!TIP]
-> Copy your space's preview access token from **Settings** > **Access Tokens**.
-> Learn more about Storyblok [access tokens](https://www.storyblok.com/docs/concepts/access-tokens).
+In Storyblok, **Settings → Visual Editor → Location** is `https://localhost:3000/`. Open any story to edit it in place.
 
-### Connect the Visual Editor
+## How content maps to code
 
-To render a preview of the local project in the Visual Editor, follow these steps:
+- Each Storyblok block has a component in `app/storyblok/`, named after the block (`track_section` → `TrackSection.vue`). `app/plugins/storyblok-block-names.ts` registers each one under its exact block name.
+- `app/pages/[...slug].vue` fetches a story by URL and resolves case study references on `track_section` and `role`.
+- Content version: drafts in `nuxt dev`, published in builds. Override with `NUXT_PUBLIC_STORYBLOK_VERSION=draft|published`.
 
-1. In your space, navigate to **Settings > Visual Editor**.
-2. Set the default environment to `https://localhost:3000/`.
-3. Save.
-4. Open the `home` story.
-5. Click **Config**.
-6. Type `/` in the **Real path**.
+## Production: Cloudflare Pages
 
-Run the development server:
-```sh
-npm run dev
-```
+`npm run generate` writes flat HTML to `.output/public`, crawling from the home page. The build fails if the home story isn't published, so an empty site never goes live.
 
-> [!IMPORTANT]
-> To connect the Storyblok Visual Editor, the local project must run over HTTPS. Learn more in the [Visual Editor concept](https://www.storyblok.com/docs/concepts/visual-editor#local-development-via-https). See the [Visual Preview part of the Nuxt guide](https://storyblok.com/docs/guides/nuxt/visual-preview) for detailed instructions.
+Cloudflare Pages builds from `main` on every push:
 
-Back in Storyblok, open the **Home** story to start editing.
+| Setting | Value |
+|-|-|
+| Build command | `npm run generate` |
+| Output directory | `.output/public` |
+| Node version | from `.node-version` |
+| `STORYBLOK_DELIVERY_API_TOKEN` | the space's **Public** token (published content only) |
+| `STORYBLOK_REGION` | `eu` |
 
-Happy building!
-
-## Resources
-
-- To learn more about what you can do with Storyblok, visit [our documentation and learning hub](https://www.storyblok.com/docs).
-- To learn more about the integration between Storyblok and Nuxt, check our [dedicated developer tutorials](https://www.storyblok.com/tutorials?technologies=nuxt).
-- To learn more about Nuxt, check the [official documentation](https://nuxt.com/docs).
-
-### Support
-
-- Have questions, need help, want to chat with other users? [Join our Discord community](https://storyblok.com/join-discord).
-- Visit the Storyblok [Help Center](https://support.storyblok.com/hc/en-us).
+Publishing in Storyblok triggers a rebuild through a Pages deploy hook, set as a Storyblok webhook.

@@ -30,6 +30,24 @@ export default defineNuxtConfig({
 
   ssr: true,
 
+  runtimeConfig: {
+    public: {
+      /**
+       * Which Storyblok content to read. Empty means: drafts in `nuxt dev`,
+       * published content in builds. Override with NUXT_PUBLIC_STORYBLOK_VERSION.
+       */
+      storyblokVersion: "",
+    },
+  },
+
+  /** `nuxt generate` crawls from the home page and writes flat HTML. */
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: ["/"],
+    },
+  },
+
   devServer: {
     https: true,
   },
