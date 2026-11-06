@@ -42,6 +42,9 @@ export default defineNuxtConfig({
 
   /** `nuxt generate` crawls from the home page and writes flat HTML. */
   nitro: {
+    // Pin the preset: on Cloudflare's build image Nitro would otherwise
+    // auto-detect cloudflare-pages and write to `dist` instead.
+    preset: "static",
     prerender: {
       crawlLinks: true,
       routes: ["/"],
