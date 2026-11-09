@@ -17,6 +17,34 @@ I built it end to end with Claude Code connected to Storyblok's MCP server, CLI 
 
 ---
 
+## Explainer: shape first, content second
+
+*This is also on the site as a Storyblok page, at `/writing/shape-first`.*
+
+I'll admit it. The most useful thing I did on this site happened before I'd typed a single word of content into Storyblok.
+
+Give anyone a shiny new CMS and they'll make a page and start pouring content in. I've done it. Storyblok will happily let you. But what you've built is a very expensive Word document. So I worked out the *shape* first.
+
+You only need four words to follow along. A **story** is a piece of content, usually a page: Home is a story, and so is every project. A **content type** is the template a story is built on, and this site has three: `page`, `project` and `article`. A **block** is a reusable chunk with its own fields that you drop into a story and drag around. Lego for content. And a **reference** is a field that points at another story rather than copying it, which is quietly the most useful thing in the box.
+
+My starting point was a folder of CVs, half-finished drafts and notes to self. Before creating anything, I asked three questions of every bit of it.
+
+First, does it have a life of its own? A project has its own URL, its own case study, and turns up in more than one place. That's not a section, that's a thing. So `project` is a content type, with one story per project in a `work/` folder.
+
+Second, is it part of something bigger? The hero, my principles, each job in my work history. They only live on the home page, so they're blocks nested inside Home's `body`.
+
+Third, where else does it show up? HomeServe is featured work. It's also a project under Razor in my work history, and the evidence for one of my principles. Rather than three copies, each spot holds a reference to one HomeServe story. Fix a typo once and it's fixed everywhere.
+
+Case studies got the same treatment. Rather than one big rich-text field (the CMS equivalent of a junk drawer), each is a stack of blocks that *mean* something: a `reframe` (asked for versus actual problem), a `decision`, a `stat`. I can reshuffle a case study in the Visual Editor without touching code. My favourite bit: `stat` has a required caveat field, so I can't publish a number without saying where it came from. The structure is doing editorial work.
+
+Get the shape right and the code very nearly writes itself. Every block gets exactly one Vue file in `app/storyblok/`, and `@storyblok/nuxt` registers them for you, converting snake_case names to PascalCase. So `text_section` becomes `TextSection.vue`, the `project` content type becomes `Project.vue`, and a referenced project renders through `app/components/ProjectSummary.vue`. A parent never decides what its children are. It hands each one to `<StoryblokComponent>`, which picks the right file, so nesting works the same at every level.
+
+References need one extra step. Storyblok hands them back as IDs, so `app/pages/[...slug].vue` asks for `principle.evidence`, `featured_work.projects` and `role.projects` to be resolved into full stories. Twice, slightly annoyingly: once for the API and once for the Visual Editor's live bridge. Forget the bridge one and your project cards quietly vanish the moment someone starts editing. Not ideal with a client watching.
+
+Storyblok rewards you for deciding what your content *is* before you decide what it says. Spend twenty minutes on the shape (what's a story, what's a block, what gets referenced) and the components practically fall out. Skip it, and you've got pages. Just... pages.
+
+---
+
 ## Run it locally
 
 ### Prerequisites
