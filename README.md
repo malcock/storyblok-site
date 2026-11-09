@@ -17,34 +17,6 @@ I built it end to end with Claude Code connected to Storyblok's MCP server, CLI 
 
 ---
 
-## Explainer: shape first, content second
-
-*This is also on the site as a Storyblok page, at `/writing/shape-first`.*
-
-I'll admit it. The most useful thing I did on this site happened before I'd typed a single word of content into Storyblok.
-
-Give anyone a shiny new CMS and they'll make a page and start pouring content in. I've done it. Storyblok will happily let you. But what you've built is a very expensive Word document. So I worked out the *shape* first.
-
-You only need four words to follow along. A **story** is a piece of content, usually a page: Home is a story, and so is every project. A **content type** is the template a story is built on, and this site has three: `page`, `project` and `article`. A **block** is a reusable chunk with its own fields that you drop into a story and drag around. Lego for content. And a **reference** is a field that points at another story rather than copying it, which is quietly the most useful thing in the box.
-
-My starting point was a folder of CVs, half-finished drafts and notes to self. Before creating anything, I asked three questions of every bit of it.
-
-First, does it have a life of its own? A project has its own URL, its own case study, and turns up in more than one place. That's not a section, that's a thing. So `project` is a content type, with one story per project in a `work/` folder.
-
-Second, is it part of something bigger? The hero, my principles, each job in my work history. They only live on the home page, so they're blocks nested inside Home's `body`.
-
-Third, where else does it show up? HomeServe is featured work. It's also a project under Razor in my work history, and the evidence for one of my principles. Rather than three copies, each spot holds a reference to one HomeServe story. Fix a typo once and it's fixed everywhere.
-
-Case studies got the same treatment. Rather than one big rich-text field (the CMS equivalent of a junk drawer), each is a stack of blocks that *mean* something: a `reframe` (asked for versus actual problem), a `decision`, a `stat`. I can reshuffle a case study in the Visual Editor without touching code. My favourite bit: `stat` has a required caveat field, so I can't publish a number without saying where it came from. The structure is doing editorial work.
-
-Get the shape right and the code very nearly writes itself. Every block gets exactly one Vue file in `app/storyblok/`, and `@storyblok/nuxt` registers them for you, converting snake_case names to PascalCase. So `text_section` becomes `TextSection.vue`, the `project` content type becomes `Project.vue`, and a referenced project renders through `app/components/ProjectSummary.vue`. A parent never decides what its children are. It hands each one to `<StoryblokComponent>`, which picks the right file, so nesting works the same at every level.
-
-References need one extra step. Storyblok hands them back as IDs, so `app/pages/[...slug].vue` asks for `principle.evidence`, `featured_work.projects` and `role.projects` to be resolved into full stories. Twice, slightly annoyingly: once for the API and once for the Visual Editor's live bridge. Forget the bridge one and your project cards quietly vanish the moment someone starts editing. Not ideal with a client watching.
-
-Storyblok rewards you for deciding what your content *is* before you decide what it says. Spend twenty minutes on the shape (what's a story, what's a block, what gets referenced) and the components practically fall out. Skip it, and you've got pages. Just... pages.
-
----
-
 ## Run it locally
 
 ### Prerequisites
@@ -55,6 +27,7 @@ Storyblok rewards you for deciding what your content *is* before you decide what
 
 To *rebuild* the content model with AI as I did, you also need:
 
+- a folder of source content for the agent to work from (mine was CVs, half-finished drafts and notes to self);
 - the [Storyblok MCP server](https://www.storyblok.com/docs) connected to your assistant;
 - the Storyblok CLI (`npm i -g storyblok`), authenticated with a personal access token (`storyblok login`);
 - the [Storyblok agent skills](https://github.com/storyblok/agent-plugin).
@@ -118,12 +91,13 @@ To rebuild whenever you publish:
 
 ## Findings
 
-**The real lesson is about structure, not tooling.** To get the most out of Storyblok, you (or your agent!) should think about information architecture before adding any content. My most useful prompt asked for *options* for structuring the site before anything was created. Without that, an agent will happily pour content into basic pages and you lose most of what makes Storyblok worth having: reusable blocks, references and editors rearranging pieces in the Visual Editor.
+**The real lesson is about structure, not tooling.** To get the most out of Storyblok, you (or your agent) need to think about information architecture before adding any content. I wrote this up properly in [Shape first, content second](https://storyblok-site.pages.dev/writing/shape-first/). My most useful prompt asked for *options* for structuring the site before anything was created. Without that, an agent will happily pour content into basic pages and you lose most of what makes Storyblok worth having: reusable blocks, references and editors rearranging pieces in the Visual Editor.
 
-**MCP plus agent skills is genuinely quick.** Going from my CV notes to a 22-component model with 16 stories of real content took about 10 minutes, all through the MCP server. The skills made a visible difference:
+**MCP plus agent skills is quick.** Going from my CV notes to a 22-component model with 16 stories of real content took about 10 minutes, all through the MCP server. The skills made a visible difference:
+
 - The agent wrote a plan before writing anything.
 - It refused to delete anything without asking.
-- It projected its API calls to stay small.
+- It asked the API for only the fields it needed, so responses stayed small.
 - It knew that `updateStory` and `updateComponent` are full replacements, so it always read the current version first.
 
 My first attempt used neither the CLI nor the skills and still got there with few problems. It was just less careful.
@@ -163,9 +137,15 @@ Times are taken from the session log on 9 November 2026.
 | Static build, GitHub push, Cloudflare checklist | 10:41 to 10:52 (11 min) |
 | Constructivist redesign, in a background agent | 10:52 to 11:04 (12 min, whilst I wrote docs) |
 | My notes, then this README and AI.md | 11:04 to 11:15 (11 min) |
-| **Total** | **about 1 hour** (10:13 to 11:15) |
+| **The build** | **about 1 hour** (10:13 to 11:15) |
+| The shape-first write-up, doc tweaks and a couple of bug fixes (page titles, for one) | 11:15 to 11:56 (about 40 min) |
+| **Total** | **about 1 hour 45 min** (10:13 to 11:56) |
 
 That doesn't include the bits I did by hand in dashboards: access tokens, the preview URL, the Pages project and the webhook.
+
+The site itself took an hour. The last 40 minutes or so was polish: writing things up, tightening the docs and fixing a few things I spotted along the way.
+
+It could probably have been done in one shot with a more complete prompt. I split it into several on purpose, so you can see the working.
 
 ---
 
@@ -175,7 +155,7 @@ That doesn't include the bits I did by hand in dashboards: access tokens, the pr
 app/
   pages/[...slug].vue     fetches the story for any URL, resolves references
   storyblok/              one component per Storyblok block (auto-registered)
-  components/             ProjectSummary: renders a referenced project
+  components/             shared bits, e.g. ProjectSummary for a referenced project
   plugins/                snake_case aliases for block names
   utils/linkHref.js       Storyblok link fields → hrefs
 nuxt.config.ts            Storyblok module, static output, dev-only HTTPS
