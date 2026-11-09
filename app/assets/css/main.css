@@ -1,0 +1,314 @@
+/*
+ * Global stylesheet: tokens, base typography and the shared page grid.
+ * Components reference the semantic layer only. Colour literals live in the
+ * palette layer and nowhere else.
+ */
+
+/* ---------- Palette layer (hue names are fine here) ---------- */
+:root {
+	--palette-paper-100: #f3eee4;
+	--palette-paper-200: #e8e1d4;
+	--palette-ink-900: #1c1a17;
+	--palette-ink-600: #5e584f;
+	--palette-stone-400: #8c857a;
+	--palette-stone-300: #a9a194;
+	--palette-red-600: #b8321f;
+	--palette-red-300: #e8654a;
+}
+
+/* ---------- Semantic layer (components use these) ---------- */
+:root {
+	--color-surface: var(--palette-paper-100);
+	--color-surface-raised: var(--palette-paper-200);
+	--color-text: var(--palette-ink-900);
+	--color-text-muted: var(--palette-ink-600);
+	--color-rule: var(--palette-ink-900);
+	--color-rule-soft: var(--palette-stone-400);
+	--color-accent: var(--palette-red-600);
+	--color-accent-contrast: var(--palette-paper-100);
+	--color-focus: var(--palette-red-600);
+	--color-geometry-strong: var(--palette-ink-900);
+	--color-geometry-accent: var(--palette-red-600);
+
+	/* Inverse surfaces (ink bands). */
+	--color-inverse-surface: var(--palette-ink-900);
+	--color-inverse-text: var(--palette-paper-100);
+	--color-inverse-text-muted: var(--palette-stone-300);
+	--color-inverse-accent: var(--palette-red-300);
+	--color-inverse-rule: var(--palette-stone-400);
+
+	/* Type */
+	--font-display: 'Archivo', 'Arial Narrow', sans-serif;
+	--font-text: 'Source Serif 4', Georgia, serif;
+	--font-code: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+	--display-width: 72; /* Archivo wdth axis: condensed but not compressed */
+
+	--step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.9rem);
+	--step-0: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem);
+	--step-1: clamp(1.25rem, 1.15rem + 0.45vw, 1.5rem);
+	--step-2: clamp(1.5rem, 1.3rem + 0.9vw, 2.125rem);
+	--step-3: clamp(1.9rem, 1.5rem + 1.8vw, 3rem);
+	--step-4: clamp(2.4rem, 1.7rem + 3.2vw, 4.5rem);
+	--step-5: clamp(2.6rem, 1.6rem + 4.6vw, 5.75rem);
+
+	/* Space */
+	--space-2xs: 0.25rem;
+	--space-xs: 0.5rem;
+	--space-s: 0.875rem;
+	--space-m: 1.25rem;
+	--space-l: 2rem;
+	--space-xl: clamp(2.5rem, 2rem + 2.5vw, 4rem);
+	--space-2xl: clamp(3.5rem, 2.5rem + 5vw, 7rem);
+
+	/* Layout */
+	--gutter: clamp(1rem, 0.5rem + 3vw, 3rem);
+	--max-width: 82rem;
+	--measure: 65ch;
+	--rule-heavy: 0.25rem;
+	--rule-thin: 1px;
+	/* One diagonal for the whole site: rise of a slanted band edge. */
+	--slant: clamp(1.75rem, 5vw, 4.5rem);
+}
+
+/* ---------- Reset and base ---------- */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+	scrollbar-color: var(--color-rule-soft) var(--color-surface);
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	background: var(--color-surface);
+	color: var(--color-text);
+	font-family: var(--font-text);
+	font-size: var(--step-0);
+	line-height: 1.6;
+	font-optical-sizing: auto;
+	overflow-x: clip;
+	text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote,
+pre {
+	margin: 0;
+}
+
+ul,
+ol {
+	padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--font-display);
+	font-variation-settings: 'wdth' var(--display-width);
+	font-weight: 800;
+	line-height: 1.02;
+	letter-spacing: 0;
+	word-spacing: 0.06em;
+	text-wrap: balance;
+}
+
+p {
+	text-wrap: pretty;
+}
+
+strong {
+	font-weight: 600;
+}
+
+a {
+	color: inherit;
+	text-decoration-line: underline;
+	text-decoration-thickness: 1px;
+	text-decoration-color: var(--color-accent);
+	text-underline-offset: 0.2em;
+	transition: text-decoration-thickness 120ms ease-out;
+}
+
+a:hover {
+	text-decoration-thickness: 3px;
+}
+
+:focus-visible {
+	outline: 3px solid var(--color-focus);
+	outline-offset: 3px;
+	border-radius: 1px;
+}
+
+::selection {
+	background: var(--color-accent);
+	color: var(--color-accent-contrast);
+}
+
+/* Tokens re-pointed inside an ink band, so children need no special cases. */
+.inverse {
+	--color-surface: var(--color-inverse-surface);
+	--color-text: var(--color-inverse-text);
+	--color-text-muted: var(--color-inverse-text-muted);
+	--color-rule: var(--color-inverse-text);
+	--color-rule-soft: var(--color-inverse-rule);
+	--color-accent: var(--color-inverse-accent);
+	--color-accent-contrast: var(--palette-ink-900);
+	--color-focus: var(--color-inverse-text);
+	background: var(--color-inverse-surface);
+	color: var(--color-text);
+}
+
+/* A band whose top edge is the site's single diagonal. Padding absorbs the
+ * slant so the clip never touches text. */
+.slanted {
+	clip-path: polygon(0 var(--slant), 100% 0, 100% 100%, 0 100%);
+	padding-top: calc(var(--slant) + var(--space-xl));
+}
+
+/* ---------- Shared grid ----------
+ * Every section and case-study block sits on the same two-column grid:
+ * a narrow label column (what this is) and a wide main column (the content).
+ */
+.row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	column-gap: var(--space-l);
+	row-gap: var(--space-m);
+	padding-inline: max(var(--gutter), calc((100% - var(--max-width)) / 2));
+}
+
+.row__label,
+.row__main {
+	min-width: 0;
+}
+
+@media (min-width: 60rem) {
+	.row {
+		grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+		column-gap: var(--space-xl);
+	}
+
+	.row__label {
+		grid-column: 1;
+	}
+
+	.row__main {
+		grid-column: 2;
+	}
+
+	.row__full {
+		grid-column: 1 / -1;
+	}
+}
+
+/* Section headings on the home page: condensed caps under a heavy rule. */
+.section-title {
+	font-size: var(--step-2);
+	text-transform: uppercase;
+	letter-spacing: 0.01em;
+	padding-top: var(--space-s);
+	border-top: var(--rule-heavy) solid var(--color-rule);
+}
+
+@media (min-width: 60rem) {
+	.section-title--sticky {
+		position: sticky;
+		top: var(--space-l);
+		align-self: start;
+	}
+}
+
+/* Case-study block headings: same rule, sentence case. */
+.block-title {
+	font-size: var(--step-2);
+	line-height: 1.08;
+	padding-top: var(--space-s);
+	border-top: var(--rule-thin) solid var(--color-rule);
+}
+
+/* Every case-study block shares this rhythm. */
+.block {
+	padding-block: var(--space-xl);
+}
+
+/* Small condensed caps used for labels and metadata. */
+.label {
+	font-family: var(--font-display);
+	font-variation-settings: 'wdth' var(--display-width);
+	font-weight: 700;
+	font-size: var(--step--1);
+	letter-spacing: 0.08em;
+	line-height: 1.3;
+	text-transform: uppercase;
+}
+
+/* Long-form text. */
+.prose {
+	max-width: var(--measure);
+}
+
+.prose > * + * {
+	margin-top: 1em;
+}
+
+.prose ul,
+.prose ol {
+	padding-left: 1.25em;
+}
+
+.prose li + li {
+	margin-top: 0.35em;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.skip-link {
+	position: absolute;
+	left: var(--gutter);
+	top: -10rem;
+	z-index: 10;
+	padding: var(--space-xs) var(--space-s);
+	background: var(--color-text);
+	color: var(--color-surface);
+}
+
+.skip-link:focus {
+	top: var(--space-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
