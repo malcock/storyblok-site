@@ -25,3 +25,5 @@ logs
 
 # Prettier
 .prettierrc
+# Claude Code (worktrees, local settings)
+.claude/

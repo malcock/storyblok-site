@@ -1,78 +1,155 @@
+# Martin Alcock: personal site (Nuxt + Storyblok)
 
-# Storyblok Core Space Blueprint: Nuxt
+My portfolio and work history, built as a test of one question: *how fast can you get something real working with Storyblok, and does it play nicely with AI tools?*
 
-Integrate [Nuxt](https://nuxt.com/) with [Storyblok](http://www.storyblok.com) as a headless CMS.
+I built it end to end with Claude Code connected to Storyblok's MCP server, CLI and agent skills. The prompts that did the work are in [AI.md](AI.md).
 
-This blueprint is ideal for kickstarting new Storyblok and Next.js projects. What's inside:
-- Pre-configured default blocks: `page`, `teaser`, `grid`, and `feature`.
-- Support for the Visual Editor's live preview.
-- Dynamic routing to fetch and render new stories automatically.
-- Minimal styling.
+**Full disclosure:** I'd essentially completed this task before my first interview stage with Sian, but it didn't feel right to submit something finished before I'd been asked for it. That earlier attempt is at [github.com/malcock/personal-site](https://github.com/malcock/personal-site) ([martinalcock.pages.dev](https://martinalcock.pages.dev)). This repo is a fresh run, done the "proper" way with the CLI and the new agent skills, so I could compare the two.
 
-> [!TIP]
-> Follow our [Nuxt guide](LINK) for a step-by-step walkthrough and learn more about Storyblok's range of features, including rich text rendering, custom content modeling, and internationalization. See the [@storyblok/nuxt package reference](https://storyblok.com/docs/packages/storyblok-nuxt) for further information.
+---
 
-***
+## What's in it
 
-[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in%20GitHub%20Codespaces-dad4ff.svg?style=for-the-badge&logo=GitHub&logoColor=181717&labelColor=ffffff&color=dad4ff)](https://github.com/codespaces/new?skip_quickstart=true&machine=basicLinux32gb&repo=962644002&ref=main&geo=EuropeWest)
-[![Try Storyblok free](https://img.shields.io/badge/Try%20Storyblok-dad4ff.svg?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTQuNzA3IDIuNTM4aDIyLjUyOXYyMy41ODdINC43MDd6IiBzdHlsZT0iZmlsbDojZmZmIi8+PHBhdGggZmlsbD0iIzFmMWYxZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMS43NDMgMi42MDFBMi41OTcgMi41OTcgMCAwIDEgNC4zMzUgMGgyMy4zM2EyLjU5NyAyLjU5NyAwIDAgMSAyLjU5MiAyLjYwMXYyMy40MTFhMi41OTcgMi41OTcgMCAwIDEtMi41OTIgMi42MDJIMTIuNTQ4bC0zLjg3MiAzLjIwOGEuNzcuNzcgMCAwIDEtMS4yNjEtLjU5N3YtMi42MTFoLTMuMDhhMi41OTcgMi41OTcgMCAwIDEtMi41OTItMi42MDJabTUuNjcgMi4xMjdoMTIuNDYyYzIuNjkxIDAgNC44NzMgMi4xOSA0Ljg3MyA0Ljg5IDAgMi4xNjQtMS40IDQtMy4zNDIgNC42NDRhNC44ODcgNC44ODcgMCAwIDEgMy45OSA0LjgxYzAgMi43MDEtMi4xODEgNC44OS00Ljg3MyA0Ljg5SDcuNDEzdi05LjQ1NFptMTAuMzY0IDQuNEgxMS45NXYyLjkzNGg1LjgyOGMuODA4IDAgMS40NjItLjY1NiAxLjQ2Mi0xLjQ2NyAwLS44MS0uNjU0LTEuNDY3LTEuNDYyLTEuNDY3em0tNS44MjggNi41Mmg2LjMxNGMuODk3IDAgMS42MjQuNzMgMS42MjQgMS42MyAwIC45MDEtLjcyNyAxLjYzLTEuNjI0IDEuNjNoLTYuMzE0eiIgY2xpcC1ydWxlPSJldmVub2RkIiBzdHlsZT0ic3Ryb2tlLXdpZHRoOjEuNTE3NzUiLz48L3N2Zz4K&labelColor=ffffff)](https://app.storyblok.com/#/signup)
-[![Join the Storyblok Discord community](https://img.shields.io/discord/700316478792138842?style=for-the-badge&logo=discord&label=Join%20our%20community&labelColor=ffffff&color=dad4ff)](https://storyblok.com/join-discord)
+- **Home** (`page`) is a stack of sections you can reorder in the Visual Editor: hero, principles, featured work, work history, elsewhere, contact.
+- **Projects** (`project`, in `work/`) are stories of their own. Home *references* them from three places (principles, featured work and each role in the work history), so every summary is written once.
+- **Case studies** are a project's `body`: composable blocks like `reframe` (asked for vs the actual problem), `stat` (a number with a required caveat), `decision`, `sequence` and `observation`. There are hardly any images, because of NDAs, so the structure does the visual work. A project with an empty body is just a summary, with no page of its own.
+- **Output** is flat HTML. `npm run generate` prerenders every page, ready for Cloudflare Pages.
 
-## Get Started
+---
 
-**No Storyblok account yet? [Sign up now](https://app.storyblok.com/#/signup?utm_source=docs) to experience a 14-day free trial of all features and enjoy our completely free Starter plan.**
+## Run it locally
 
-1. Create an empty new Storyblok space
-2. Create a new repository based on this template
-3. Open the project on your device
-4. Install dependencies
+### Prerequisites
 
-```sh
+- Node 22+ (pinned in `.node-version`).
+- A Storyblok space with the content model. Mine is `storyblok-site`, in the EU region.
+- [mkcert](https://github.com/FiloSottile/mkcert), for HTTPS on localhost. The Visual Editor only loads previews over HTTPS. `vite-plugin-mkcert` handles the certificate in dev, but your machine has to trust it the first time.
+
+To *rebuild* the content model with AI as I did, you also need:
+
+- the [Storyblok MCP server](https://www.storyblok.com/docs) connected to your assistant;
+- the Storyblok CLI (`npm i -g storyblok`), authenticated with a personal access token (`storyblok login`);
+- the [Storyblok agent skills](https://github.com/storyblok/agent-plugin).
+
+### Setup
+
+```bash
 npm install
+cp .env.example .env
 ```
 
-### Authentication
+Fill in `.env`:
 
-In the root of the project, create a `.env` file to store the access token of your space:
-
-```sh
-STORYBLOK_DELIVERY_API_TOKEN=<REPLACE_WITH_YOUR_TOKEN>
+```bash
+STORYBLOK_DELIVERY_API_TOKEN=<your Preview token, from Settings → Access Tokens>
+STORYBLOK_REGION=eu
 ```
 
-> [!TIP]
-> Copy your space's preview access token from **Settings** > **Access Tokens**.
-> Learn more about Storyblok [access tokens](https://www.storyblok.com/docs/concepts/access-tokens).
+Locally, use the **Preview** token, because it can read drafts. Never use it for the deployed site (see below).
 
-### Connect the Visual Editor
+### Develop with the Visual Editor
 
-To render a preview of the local project in the Visual Editor, follow these steps:
-
-1. In your space, navigate to **Settings > Visual Editor**.
-2. Set the default environment to `https://localhost:3000/`.
-3. Save.
-4. Open the `home` story.
-5. Click **Config**.
-6. Type `/` in the **Real path**.
-
-Run the development server:
-```sh
-npm run dev
+```bash
+npm run dev     # serves https://localhost:3000/
 ```
 
-> [!IMPORTANT]
-> To connect the Storyblok Visual Editor, the local project must run over HTTPS. Learn more in the [Visual Editor concept](https://www.storyblok.com/docs/concepts/visual-editor#local-development-via-https). See the [Visual Preview part of the Nuxt guide](https://storyblok.com/docs/guides/nuxt/visual-preview) for detailed instructions.
+In Storyblok, go to **Settings → Visual Editor** and set the preview URL to `https://localhost:3000/`. **It must end with a trailing slash**, otherwise the preview breaks. Then open the Home story. Clicking any block opens its fields, and edits appear live.
 
-Back in Storyblok, open the **Home** story to start editing.
+Dev mode shows **draft** content. Builds show **published** content. You can override either with `STORYBLOK_VERSION=draft|published`.
 
-Happy building!
+### Build the static site
 
-## Resources
+```bash
+npm run generate                            # published content → .output/public
+STORYBLOK_VERSION=draft npm run generate    # check drafts before publishing
+npx serve .output/public                    # look at the result
+```
 
-- To learn more about what you can do with Storyblok, visit [our documentation and learning hub](https://www.storyblok.com/docs).
-- To learn more about the integration between Storyblok and Nuxt, check our [dedicated developer tutorials](https://www.storyblok.com/tutorials?technologies=nuxt).
-- To learn more about Nuxt, check the [official documentation](https://nuxt.com/docs).
+The build fails if any page errors, including a missing Home story. A broken build never ships.
 
-### Support
+### Deploy (Cloudflare Pages)
 
-- Have questions, need help, want to chat with other users? [Join our Discord community](https://storyblok.com/join-discord).
-- Visit the Storyblok [Help Center](https://support.storyblok.com/hc/en-us).
+Create the project in the Cloudflare dashboard with **Connect to Git**, not with `wrangler pages project create`. A project created by Wrangler is direct-upload only and can never be connected to GitHub later.
+
+| Setting | Value |
+|-|-|
+| Production branch | `main` |
+| Build command | `npm run generate` |
+| Output directory | `.output/public` |
+| `STORYBLOK_DELIVERY_API_TOKEN` | your **Public** token |
+| `STORYBLOK_REGION` | `eu` |
+
+The token is baked into the generated HTML. That's why production must use the **Public** token, which can only read published content.
+
+To rebuild whenever you publish:
+
+1. In the Pages project, create a deploy hook under **Settings → Builds → Deploy hooks**.
+2. Add the hook's URL as a Storyblok webhook under **Settings → Webhooks**, triggered on "Story published" and "Story unpublished".
+
+---
+
+## Findings
+
+**The real lesson is about structure, not tooling.** To get the most out of Storyblok, you (or your agent!) should think about information architecture before adding any content. My most useful prompt asked for *options* for structuring the site before anything was created. Without that, an agent will happily pour content into basic pages and you lose most of what makes Storyblok worth having: reusable blocks, references and editors rearranging pieces in the Visual Editor.
+
+**MCP plus agent skills is genuinely quick.** Going from my CV notes to a 22-component model with 16 stories of real content took about 10 minutes, all through the MCP server. The skills made a visible difference:
+- The agent wrote a plan before writing anything.
+- It refused to delete anything without asking.
+- It projected its API calls to stay small.
+- It knew that `updateStory` and `updateComponent` are full replacements, so it always read the current version first.
+
+My first attempt used neither the CLI nor the skills and still got there with few problems. It was just less careful.
+
+**What tripped me up:**
+
+- **New spaces and the MCP connector.** If you've already authorised the Storyblok MCP connector and then create a new space, the connector won't have access to it. I had to disconnect and reconnect it.
+- **Block names vs Vue component names.** Storyblok names blocks in `snake_case` (`text_section`). The Nuxt SDK looks for the raw name first, logs `Component could not be found for blok "text_section"`, and *then* falls back to `TextSection.vue`. The page renders fine, but the logs are full of errors that look fatal.
+  - In my first attempt this was the biggest source of confusion.
+  - This time the agent skills got the file naming right first time, but the noisy errors were still there.
+  - Registering snake_case aliases in `app/plugins/storyblok-aliases.js` silenced them.
+- **Things the MCP server can't do.** It can't set the Visual Editor preview URL, create webhooks or create component groups. All three are a minute's work in the UI, but expect a short manual checklist.
+- **The preview URL needs a trailing slash.** `https://localhost:3000/`, not `https://localhost:3000`.
+- **Static HTML and the Visual Editor.** Deploying flat HTML means the live site can't power the Visual Editor: it only has published content and no server. Locally that's fine (`npm run dev`). For editors who aren't developers, the fix is a separate preview deployment built with `STORYBLOK_VERSION=draft` and the Preview token. That deployment must sit behind access control (e.g. Cloudflare Access), because the token ends up in the HTML.
+
+### Other pitfalls, from the session log
+
+- **`storyblok create` refuses a non-empty folder**, even one that only has `.git` in it. I scaffolded into a sibling folder and moved the files across.
+- **The starter space isn't empty.** It ships with `page`, `teaser`, `grid`, `feature` and a "Hello world" Home story. The agent restricted `page` to the new blocks and replaced Home's content. It didn't delete the starter blocks, because deletion is destructive and needs explicit sign-off.
+- **The Nuxt blueprint has dev-only settings baked in.** It hardcodes `version: 'draft'` and turns on HTTPS/mkcert for every build, which can break a CI build. Both are now dev-only.
+- **Story references come back as UUIDs.** You need `resolve_relations` on the API call *and* `resolveRelations` on the bridge. Otherwise references vanish as soon as you edit in the Visual Editor.
+- **Unpublished references disappear quietly.** If Home is published but a project it references isn't, that project's card simply doesn't render. Publish the projects too.
+- **Wrangler said it wasn't logged in** even though a saved login existed, so the agent couldn't confirm which Cloudflare account it was on. The Git-connected Pages setup doesn't need Wrangler anyway.
+- **AI copy needs checking against the source.** The agent embellished four details in the case studies and corrected them on review (see [AI.md](AI.md)).
+
+---
+
+## How long it took
+
+Times are taken from the session log on 9 November 2026.
+
+| Step | Time |
+|-|-|
+| IA options from my CV folder | 10:13 to 10:20 (7 min) |
+| Content model and all content, via MCP | 10:20 to 10:30 (10 min) |
+| Nuxt frontend with the Visual Editor working | 10:31 to 10:40 (9 min) |
+| Static build, GitHub push, Cloudflare checklist | 10:41 to 10:52 (11 min) |
+| Constructivist redesign, in a background agent | 10:52 to 11:04 (12 min, whilst I wrote docs) |
+| My notes, then this README and AI.md | 11:04 to 11:15 (11 min) |
+| **Total** | **about 1 hour** (10:13 to 11:15) |
+
+That doesn't include the bits I did by hand in dashboards: access tokens, the preview URL, the Pages project and the webhook.
+
+---
+
+## Project layout
+
+```
+app/
+  pages/[...slug].vue     fetches the story for any URL, resolves references
+  storyblok/              one component per Storyblok block (auto-registered)
+  components/             ProjectSummary: renders a referenced project
+  plugins/                snake_case aliases for block names
+  utils/linkHref.js       Storyblok link fields → hrefs
+nuxt.config.ts            Storyblok module, static output, dev-only HTTPS
+AI.md                     the prompts that built this
+```
