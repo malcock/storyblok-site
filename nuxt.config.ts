@@ -25,12 +25,19 @@ export default defineNuxtConfig({
     },
   },
 
+  css: ["~/assets/css/main.css"],
+
   app: {
     head: {
+      htmlAttrs: { lang: "en-GB" },
+      meta: [{ name: "theme-color", content: "#f3eee4" }],
       link: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
         {
           rel: "stylesheet",
-          href: "https://a.storyblok.com/f/212319/x/e6ccda03b8/blueprint-blank.css",
+          // Archivo (variable width + weight) for display, Source Serif 4 for reading.
+          href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,700..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap",
         },
       ],
     },
